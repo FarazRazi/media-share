@@ -1,7 +1,7 @@
 // Global variables
 let currentUser = null;
 let currentMediaId = null;
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://media-share-iule.onrender.com/api";
 
 // DOM Elements
 const loginView = document.getElementById("loginView");
