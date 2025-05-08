@@ -361,10 +361,10 @@ app.get("/uploads/:filename", (req, res) => {
   // Check if file exists
   fs.stat(filePath, (err, stats) => {
     if (err) {
-      if (err.code === 'ENOENT') {
-        return res.status(404).send('File not found');
+      if (err.code === "ENOENT") {
+        return res.status(404).send("File not found");
       }
-      return res.status(500).send('Internal server error');
+      return res.status(500).send("Internal server error");
     }
 
     // Get file size
@@ -381,10 +381,10 @@ app.get("/uploads/:filename", (req, res) => {
       // Create read stream
       const stream = fs.createReadStream(filePath, { start, end });
       const head = {
-        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunkSize,
-        'Content-Type': 'video/mp4',
+        "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": chunkSize,
+        "Content-Type": "video/mp4",
       };
 
       res.writeHead(206, head);
@@ -392,8 +392,8 @@ app.get("/uploads/:filename", (req, res) => {
     } else {
       // No range requested, send entire file
       const head = {
-        'Content-Length': fileSize,
-        'Content-Type': 'video/mp4',
+        "Content-Length": fileSize,
+        "Content-Type": "video/mp4",
       };
 
       res.writeHead(200, head);
