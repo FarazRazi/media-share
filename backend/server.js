@@ -367,33 +367,47 @@ app.get("/uploads/:filename", (req, res) => {
       return res.status(500).send("Internal server error");
     }
 
+    // Determine content type based on file extension
+    const ext = path.extname(filename).toLowerCase();
+    let contentType = "application/octet-stream";
+    if (ext === ".mp4") {
+      contentType = "video/mp4";
+    } else if (ext === ".jpg" || ext === ".jpeg") {
+      contentType = "image/jpeg";
+    } else if (ext === ".png") {
+      contentType = "image/png";
+    } else if (ext === ".gif") {
+      contentType = "image/gif";
+    } else if (ext === ".webp") {
+      contentType = "image/webp";
+    }
+
     // Get file size
     const fileSize = stats.size;
     const range = req.headers.range;
 
-    if (range) {
-      // Parse range
+    if (range && contentType.startsWith("video/")) {
+      // Handle range requests for videos
       const parts = range.replace(/bytes=/, "").split("-");
       const start = parseInt(parts[0], 10);
       const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
       const chunkSize = end - start + 1;
 
-      // Create read stream
       const stream = fs.createReadStream(filePath, { start, end });
       const head = {
         "Content-Range": `bytes ${start}-${end}/${fileSize}`,
         "Accept-Ranges": "bytes",
         "Content-Length": chunkSize,
-        "Content-Type": "video/mp4",
+        "Content-Type": contentType,
       };
 
       res.writeHead(206, head);
       stream.pipe(res);
     } else {
-      // No range requested, send entire file
+      // Send entire file for images or when range is not requested
       const head = {
         "Content-Length": fileSize,
-        "Content-Type": "video/mp4",
+        "Content-Type": contentType,
       };
 
       res.writeHead(200, head);
