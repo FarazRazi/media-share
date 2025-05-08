@@ -1,7 +1,22 @@
 // Global variables
 let currentUser = null;
 let currentMediaId = null;
-const API_URL = "https://media-share-iule.onrender.com/api";
+
+// Configure API URL and media URL based on environment
+const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000/api"
+    : "https://media-share-iule.onrender.com/api";
+
+const getMediaUrl = (media) => {
+  const baseUrl =
+    window.location.hostname === "localhost"
+      ? "http://localhost:3000"
+      : "https://media-share-iule.onrender.com";
+  if (media.fileUrl) return media.fileUrl;
+  const filename = media.filePath.split("/").pop().split("\\").pop();
+  return `${baseUrl}/uploads/${filename}`;
+};
 
 // DOM Elements
 const loginView = document.getElementById("loginView");
@@ -410,12 +425,14 @@ async function viewMedia(mediaId) {
     const videoElement = document.getElementById("modalVideo");
     const imageElement = document.getElementById("modalImage");
 
+    const mediaUrl = getMediaUrl(media);
+
     if (media.fileType === "video") {
-      videoElement.src = media.fileUrl;
+      videoElement.src = mediaUrl;
       videoElement.style.display = "block";
       imageElement.style.display = "none";
     } else {
-      imageElement.src = media.fileUrl;
+      imageElement.src = mediaUrl;
       imageElement.style.display = "block";
       videoElement.style.display = "none";
     }

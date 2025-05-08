@@ -7,6 +7,7 @@ const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const BASE_URL = process.env.API_URL || `http://localhost:${PORT}`;
 
 // Ensure the uploads directory exists
 const UPLOADS_DIR = path.join(__dirname, "uploads");
@@ -106,6 +107,8 @@ app.post("/api/login", (req, res) => {
 });
 
 // CREATOR ENDPOINTS
+const getFileUrl = (filename) => `${BASE_URL}/api/uploads/${filename}`;
+
 app.post(
   "/api/upload",
   authenticate,
@@ -127,9 +130,7 @@ app.post(
         peoplePresent: peoplePresent.split(",").map((p) => p.trim()),
         filePath,
         fileType,
-        fileUrl: `${
-          process.env.API_URL || "http://localhost:3000"
-        }/uploads/${path.basename(filePath)}`,
+        fileUrl: getFileUrl(path.basename(filePath)),
         creatorId: req.user.id,
         creatorName: req.user.username,
         createdAt: new Date().toISOString(),
@@ -246,9 +247,7 @@ app.get("/api/videos", (req, res) => {
     title: v.title,
     caption: v.caption,
     fileType: v.fileType,
-    fileUrl: `${
-      process.env.API_URL || "http://localhost:3000"
-    }/uploads/${path.basename(v.filePath)}`,
+    fileUrl: getFileUrl(path.basename(v.filePath)),
     creatorName: v.creatorName,
     createdAt: v.createdAt,
     averageRating: v.averageRating,
@@ -267,9 +266,7 @@ app.get("/api/videos/:id", (req, res) => {
 
     const responseVideo = {
       ...video,
-      fileUrl: `${
-        process.env.API_URL || "http://localhost:3000"
-      }/uploads/${path.basename(video.filePath)}`,
+      fileUrl: getFileUrl(path.basename(video.filePath)),
       comments: videoComments,
     };
 
@@ -353,8 +350,8 @@ app.post("/api/videos/:id/comment", authenticate, (req, res) => {
   }
 });
 
-// Video streaming endpoint
-app.get("/uploads/:filename", (req, res) => {
+// Video streaming endpoint under /api
+app.get("/api/uploads/:filename", (req, res) => {
   const filename = req.params.filename;
   const filePath = path.join(UPLOADS_DIR, filename);
 
