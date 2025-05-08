@@ -425,14 +425,12 @@ async function viewMedia(mediaId) {
     const videoElement = document.getElementById("modalVideo");
     const imageElement = document.getElementById("modalImage");
 
-    const mediaUrl = getMediaUrl(media);
-
     if (media.fileType === "video") {
-      videoElement.src = mediaUrl;
+      videoElement.src = media.fileUrl;
       videoElement.style.display = "block";
       imageElement.style.display = "none";
     } else {
-      imageElement.src = mediaUrl;
+      imageElement.src = media.fileUrl;
       imageElement.style.display = "block";
       videoElement.style.display = "none";
     }
