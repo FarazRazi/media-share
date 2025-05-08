@@ -128,6 +128,9 @@ app.post(
         peoplePresent: peoplePresent.split(",").map((p) => p.trim()),
         filePath,
         fileType,
+        fileUrl: `${
+          process.env.API_URL || "http://localhost:3000"
+        }/uploads/${path.basename(filePath)}`,
         creatorId: req.user.id,
         creatorName: req.user.username,
         createdAt: new Date().toISOString(),
@@ -244,6 +247,9 @@ app.get("/api/videos", (req, res) => {
     title: v.title,
     caption: v.caption,
     fileType: v.fileType,
+    fileUrl: `${
+      process.env.API_URL || "http://localhost:3000"
+    }/uploads/${path.basename(v.filePath)}`,
     creatorName: v.creatorName,
     createdAt: v.createdAt,
     averageRating: v.averageRating,
@@ -262,6 +268,9 @@ app.get("/api/videos/:id", (req, res) => {
 
     const responseVideo = {
       ...video,
+      fileUrl: `${
+        process.env.API_URL || "http://localhost:3000"
+      }/uploads/${path.basename(video.filePath)}`,
       comments: videoComments,
     };
 
