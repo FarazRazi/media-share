@@ -26,7 +26,6 @@ const comments = [];
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
-app.use("/uploads", express.static(UPLOADS_DIR));
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
@@ -352,6 +351,55 @@ app.post("/api/videos/:id/comment", authenticate, (req, res) => {
   } else {
     res.status(404).json({ message: "Media not found!" });
   }
+});
+
+// Video streaming endpoint
+app.get("/uploads/:filename", (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(UPLOADS_DIR, filename);
+
+  // Check if file exists
+  fs.stat(filePath, (err, stats) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        return res.status(404).send('File not found');
+      }
+      return res.status(500).send('Internal server error');
+    }
+
+    // Get file size
+    const fileSize = stats.size;
+    const range = req.headers.range;
+
+    if (range) {
+      // Parse range
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      const chunkSize = end - start + 1;
+
+      // Create read stream
+      const stream = fs.createReadStream(filePath, { start, end });
+      const head = {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunkSize,
+        'Content-Type': 'video/mp4',
+      };
+
+      res.writeHead(206, head);
+      stream.pipe(res);
+    } else {
+      // No range requested, send entire file
+      const head = {
+        'Content-Length': fileSize,
+        'Content-Type': 'video/mp4',
+      };
+
+      res.writeHead(200, head);
+      fs.createReadStream(filePath).pipe(res);
+    }
+  });
 });
 
 // Root endpoint

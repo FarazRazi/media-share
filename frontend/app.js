@@ -411,11 +411,11 @@ async function viewMedia(mediaId) {
     const imageElement = document.getElementById("modalImage");
 
     if (media.fileType === "video") {
-      videoElement.src = `http://localhost:3000/${media.filePath}`;
+      videoElement.src = media.fileUrl;
       videoElement.style.display = "block";
       imageElement.style.display = "none";
     } else {
-      imageElement.src = `http://localhost:3000/${media.filePath}`;
+      imageElement.src = media.fileUrl;
       imageElement.style.display = "block";
       videoElement.style.display = "none";
     }
