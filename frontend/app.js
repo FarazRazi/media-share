@@ -425,6 +425,8 @@ async function viewMedia(mediaId) {
     const videoElement = document.getElementById("modalVideo");
     const imageElement = document.getElementById("modalImage");
 
+    console.log("Media type:", media.fileUrl);
+
     if (media.fileType === "video") {
       videoElement.src = media.fileUrl;
       videoElement.style.display = "block";
